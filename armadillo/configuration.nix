@@ -61,6 +61,7 @@
       ];
     };
 
+    fwupd.enable = true;
     printing.enable = true;
 
     pipewire = {
