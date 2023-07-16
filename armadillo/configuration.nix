@@ -61,6 +61,11 @@
       ];
     };
 
+    gnome = {
+      games.enable = true;
+      core-developer-tools.enable = true;
+    };
+
     fwupd.enable = true;
     printing.enable = true;
 
@@ -86,6 +91,16 @@
     opengl = {
       driSupport = true;
       driSupport32Bit = true;
+
+      extraPackages = with pkgs; [
+        amdvlk
+        libva
+        rocm-opencl-icd
+      ];
+
+      extraPackages32 = with pkgs; [
+        driversi686Linux.amdvlk
+      ];
     };
   };
 
