@@ -136,7 +136,7 @@
 
     autoUpgrade = {
       enable = true;
-      allowReboot = true;
+      allowReboot = false;
     };
   };
 }
