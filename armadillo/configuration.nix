@@ -12,11 +12,21 @@
       efi.canTouchEfiVariables = true;
     };
 
-    initrd.kernelModules = [
-      "amdgpu"
-    ];
+    initrd = {
+      luks.devices."luks-afbdebe4-1342-4dca-b0b3-28e9ee8da74d".device = "/dev/disk/by-uuid/afbdebe4-1342-4dca-b0b3-28e9ee8da74d";
+    };
 
     kernelPackages = pkgs.linuxPackages_latest;
+    kernelModules = [
+      "amdgpu"
+      "v4l2loopback"
+    ];
+    extraModulePackages = with config.boot.kernelPackages; [
+      v4l2loopback.out
+    ];
+    extraModprobeConfig = ''
+      options v4l2loopback exclusive_caps=1 card_label="Virtual Camera"
+    '';
   };
 
   networking = {
@@ -87,7 +97,10 @@
   sound.enable = true;
 
   hardware = {
-    pulseaudio.enable = false;
+    pulseaudio = {
+      enable = false;
+    };
+
     opengl = {
       driSupport = true;
       driSupport32Bit = true;
@@ -101,6 +114,12 @@
       extraPackages32 = with pkgs; [
         driversi686Linux.amdvlk
       ];
+    };
+    
+    bluetooth = {
+      enable = true;
+      powerOnBoot = true;
+      settings.General.Expiremental = true;
     };
   };
 
@@ -128,6 +147,7 @@
   # $ nix search wget
   environment = {
     systemPackages = with pkgs; [
+      linuxKernel.packages.linux_latest_libre.v4l2loopback
       vim
       wget
       vscode
@@ -147,7 +167,7 @@
     # this value at the release version of the first install of this system.
     # Before changing this value read the documentation for this option
     # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-    stateVersion = "23.05"; # Did you read the comment?
+    stateVersion = "23.11"; # Did you read the comment?
 
     autoUpgrade = {
       enable = true;
