@@ -15,14 +15,16 @@
     kernelPackages = pkgs.linuxPackages_latest;
     kernelModules = [
       "amdgpu"
-      #"v4l2loopback"
+      "v4l2loopback"
     ];
-    #extraModulePackages = with config.boot.kernelPackages; [
-      #v4l2loopback.out
-    #];
-    #extraModprobeConfig = ''
-    #  options v4l2loopback exclusive_caps=1 card_label="Virtual Camera"
-    #'';
+
+    extraModulePackages = with config.boot.kernelPackages; [
+      v4l2loopback.out
+    ];
+
+    extraModprobeConfig = ''
+      options v4l2loopback exclusive_caps=1 card_label="Virtual Camera"
+    '';
   };
 
   networking = {
@@ -50,28 +52,15 @@
   };
 
   services = {
-    displayManager.defaultSession = "plasma";
-    displayManager.sddm.enable = true;
-    displayManager.sddm.wayland.enable = true;
-    desktopManager.plasma6.enable = true;
-
-    xserver = {
-      enable = true;
-
-
-      xkb = {
-        layout = "us";
-        variant = "";
+    displayManager = {
+      defaultSession = "plasma";
+      sddm = {
+        enable = true;
+        wayland.enable = true;
       };
-
-      videoDrivers = [
-        "amdgpu"
-      ];
-
-      excludePackages = with pkgs; [
-        xterm
-      ];
     };
+
+    desktopManager.plasma6.enable = true;
 
     fwupd.enable = true;
     printing.enable = true;
@@ -80,41 +69,21 @@
       enable = true;
       alsa.enable = true;
       alsa.support32Bit = true;
-      pulse.enable = true;
       jack.enable = true;
     };
 
-    #flatpak.enable = true;
+    flatpak.enable = true;
   };
 
   hardware = {
-    pulseaudio = {
-      enable = false;
-    };
-
     graphics = {
         enable = true;
         enable32Bit = true;
-
-        extraPackages = with pkgs; [
-          amdvlk
-          libva
-        ];
-
-        extraPackages32 = with pkgs; [
-          driversi686Linux.amdvlk
-        ];
-    };
-
-    amdgpu.amdvlk = {
-        enable = true;
-        support32Bit.enable = true;
     };
 
     bluetooth = {
       enable = true;
       powerOnBoot = true;
-      settings.General.Expiremental = true;
     };
   };
 
@@ -138,20 +107,99 @@
   };
 
   # List packages installed in system profile. To search, run:
-  # $ nix search wget
+  # $ nix search [name]
   environment = {
+    sessionVariables = {
+      DOTNET_ROOT = "${pkgs.dotnet-sdk_9}/share/dotnet/";
+    };
+
     systemPackages = with pkgs; [
-      vim
-      wget
-      vscode
-      flatpak-builder
-      tailscale
-      pcloud
+      audacity
+      azuredatastudio
+      bitwarden-desktop
+      bottles
+      brave
       discord-canary
+      dotnet-aspnetcore_9
+      dotnet-runtime_9
+      dotnet-sdk_9
+      dotnetPackages.Nuget
+      element-desktop
+      firefox
+      flatpak-builder
+      gimp
+      git
+      heroic
+      kdePackages.kdenlive
+      lutris
+      obs-studio
+      obs-studio-plugins.droidcam-obs
+      obs-studio-plugins.obs-pipewire-audio-capture
+      obs-studio-plugins.obs-vaapi
+      obs-studio-plugins.obs-vkcapture
+      obsidian
+      onlyoffice-desktopeditors
+      organicmaps
+      osu-lazer-bin
+      pcloud
+      protontricks
+      protonup-qt
+      qgis
+      qjackctl
+      rpi-imager
+      slack
+      spotify
+      sublime-merge
+      tailscale
+      texmaker
+      vim
+      vlc
+      # This is dumb
+      (vscode-with-extensions.override {
+        vscodeExtensions = pkgs.vscode-utils.extensionsFromVscodeMarketplace [
+          # To get sha256: nix-prefetch-url https://marketplace.visualstudio.com/_apis/public/gallery/publishers/[publisher]/vsextensions/[name]/[version]/vspackage
+          {
+            name = "csharp";
+            publisher = "ms-dotnettools";
+            version = "2.72.27";
+            sha256 = "0f8mh640p628nya3iw419xvvwc64l32mnxjrga1kdx9dql2ffm3f";
+          }
+          {
+            name = "vscode-dotnet-runtime";
+            publisher = "ms-dotnettools";
+            version = "2.3.2";
+            sha256 = "0wyh977ml2ib0bpinnm47x1z7jncjw34nmsnws2zzxkds20fygqd";
+          }
+          {
+            name = "csdevkit";
+            publisher = "ms-dotnettools";
+            version = "1.18.23";
+            sha256 = "0iqvhv5m44kmwc1rvirdsdyriabb0069768hbfdvrmmwp0ihqd40";
+          }
+          {
+            name = "vscodeintellicode-csharp";
+            publisher = "ms-dotnettools";
+            version = "2.2.3";
+            sha256 = "1bpkivjnv3xf7r5vcvypdkpnkgn6d8j3a34n5cda8508j0miwwpi";
+          }
+          {
+            name = "vscode-entity-framework";
+            publisher = "richardwillis";
+            version = "0.0.20";
+            sha256 = "0karaxnaalhr08n7dyc89wr5i3y9jxa5nfiyqcxdg4ws0p3zcsbk";
+          }
+          {
+            name = "vscode-avalonia";
+            publisher = "avaloniateam";
+            version = "0.0.32";
+            sha256 = "1vrsnq7v0p508c077g62yy2h9l8dqgad5929nnyqiys3bcx5ksnq";
+          }
+        ];
+      })
+      wget
     ];
   };
 
-  # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
 
